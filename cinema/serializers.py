@@ -50,7 +50,15 @@ class MovieSerializer(serializers.Serializer):
     genres = PrimaryKeyRelatedField(many=True, queryset=Genre.objects.all())
 
     def create(self, validated_data):
-        return Movie.objects.create(**validated_data)
+        genres = validated_data.pop("genres", [])
+        actors = validated_data.pop("actors", [])
+
+        movie = Movie.objects.create(**validated_data)
+
+        movie.genres.set(genres)
+        movie.actors.set(actors)
+
+        return movie
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get("title", instance.title)
